@@ -1,0 +1,17 @@
+{% extends 'app/base.html' %}
+{% block title %}
+    Strona startowa
+{% endblock %}
+
+{% block content %}
+    <h1>{{ls.name}}</h1>
+    <ul>
+        {% for item in ls.item_set.all %}
+            {% if item.complete == False %}
+                <li>{{item.text}} -- NIEUKOŃCZONE</li>
+            {% else %}
+                <li>{{item.text}} -- UKOŃCZONE</li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+{% endblock %}
