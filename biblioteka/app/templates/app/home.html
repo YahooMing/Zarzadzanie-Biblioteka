@@ -4,5 +4,19 @@
 {% endblock %}
 
 {% block content %}
-    <h1>Strona startowa</h1>
+{% if user.is_authenticated %}
+    <h1>Homepage</h1>
+{% else %}
+    <h1>In order to use this site you need to log in</h1>
+    <br><br>
+    <form method="post" action="{% url 'login' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-success">Login</button>
+    </form>
+    <br>
+    <form method="post" action="{% url 'register' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-success">Register</button>
+    </form>
+{% endif %}
 {% endblock %}
