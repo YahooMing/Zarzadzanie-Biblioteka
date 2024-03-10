@@ -24,7 +24,7 @@ class Book(models.Model):
     author = models.CharField(max_length=200)
     genre = models.CharField(max_length=200)
     year = models.IntegerField()
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="book", null=True)
+    borrowed_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="book", null=True, blank=True)
     available = models.BooleanField(default=True)
 
     def __str__(self):

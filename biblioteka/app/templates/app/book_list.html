@@ -1,0 +1,31 @@
+{% extends 'app/base.html' %}
+{% block title %}
+    Manage books
+{% endblock %}
+
+{% block content %}
+<h1>Books</h1>
+<ul>
+    {% for book in books %}
+        <li>
+            <strong>{{ book.title }}</strong> - {{ book.author }} - {{ book.genre }} ({{ book.year }})
+            {% if book.available %}
+                <span style="color:green;">Available</span>
+            {% else %}
+                <span style="color:red;">Unavailable</span>
+            {% endif %}
+            <form action="{% url 'delete_book' book.id %}" method="post" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit">Delete</button>
+            </form>
+            <form action="{% url 'toggle_availability' book.id %}" method="post" style="display: inline;">
+                
+                {% csrf_token %}
+                <button type="submit">Change availability </button>
+            </form>
+            <a href="{% url 'edit_book' book.id %}">Edit</a>
+        </li>
+    {% endfor %}
+</ul>
+<a href="{% url 'add_book' %}">Add a new book</a>
+{% endblock %}

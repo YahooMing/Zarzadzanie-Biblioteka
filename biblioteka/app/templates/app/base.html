@@ -44,7 +44,7 @@
         <a href="/view">My list [TEST]</a>
         {% for group in user.groups.all %}
         {% if group.name == 'Employees' %}
-        <a>Management</a>
+        <a href="/books/">Management</a>
         {% endif %}
         {% endfor %}
         <form method="post" action="{% url 'logout' %}">

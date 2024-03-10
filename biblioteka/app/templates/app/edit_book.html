@@ -1,0 +1,14 @@
+{% extends 'app/base.html' %}
+{% block title %}
+    Manage books
+{% endblock %}
+
+{% block content %}
+<h1>Edytuj książkę</h1>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    
+    <button type="submit">Zapisz zmiany</button>
+</form>
+{% endblock %}
