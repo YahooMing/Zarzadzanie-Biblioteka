@@ -42,11 +42,7 @@
         <a href="/home">Home</a>
         <a href="/create/">Create a list [TEST]</a>
         <a href="/view">My list [TEST]</a>
-        {% for group in user.groups.all %}
-        {% if group.name == 'Employees' %}
-        <a href="/books/">Management</a>
-        {% endif %}
-        {% endfor %}
+        <a href="/books/">Books</a>
         <form method="post" action="{% url 'logout' %}">
             {% csrf_token %}
             <button type="submit" class="btn btn-success" style="position: fixed; text-align:center; bottom:0;margin:10px;">Logoff</button>

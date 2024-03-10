@@ -29,3 +29,6 @@ class Book(models.Model):
 
     def __str__(self):
         return self.title
+    
+    def is_available(self):
+        return not self.borrowed_by

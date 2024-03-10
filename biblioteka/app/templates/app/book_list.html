@@ -5,27 +5,35 @@
 
 {% block content %}
 <h1>Books</h1>
-<ul>
-    {% for book in books %}
-        <li>
-            <strong>{{ book.title }}</strong> - {{ book.author }} - {{ book.genre }} ({{ book.year }})
-            {% if book.available %}
-                <span style="color:green;">Available</span>
-            {% else %}
-                <span style="color:red;">Unavailable</span>
-            {% endif %}
-            <form action="{% url 'delete_book' book.id %}" method="post" style="display: inline;">
-                {% csrf_token %}
-                <button type="submit">Delete</button>
-            </form>
-            <form action="{% url 'toggle_availability' book.id %}" method="post" style="display: inline;">
-                
-                {% csrf_token %}
-                <button type="submit">Change availability </button>
-            </form>
-            <a href="{% url 'edit_book' book.id %}">Edit</a>
-        </li>
-    {% endfor %}
-</ul>
-<a href="{% url 'add_book' %}">Add a new book</a>
+<div class="input-group mb-3">
+    <div class="input-group-prepend">
+    <ul>
+        {% for book in books %}
+            <li>
+                <strong>{{ book.title }}</strong> - {{ book.author }} - {{ book.genre }} ({{ book.year }})
+                {% if book.available %}
+                    <span style="color:green;">Available</span>
+                {% else %}
+                    <span style="color:red;">Unavailable</span>
+                {% endif %}
+                {% for group in user.groups.all %}
+                    {% if group.name == 'Employees' %}
+                    <form action="{% url 'delete_book' book.id %}" method="post" style="display: inline;" class="form-group">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success">Delete</button>
+                    </form>
+                    <form action="{% url 'toggle_availability' book.id %}" method="post" style="display: inline;" class="form-group">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success">Change availability </button>
+                </form>
+                <a href="{% url 'edit_book' book.id %}" class="btn btn-success">Edit</a>
+                {% endif %}
+                {% endfor %}
+            </li>
+        {% endfor %}
+    </ul>
+    
+    </div>
+</div>
+<a href="{% url 'add_book' %}" class="btn btn-success">Add a new book</a>
 {% endblock %}
