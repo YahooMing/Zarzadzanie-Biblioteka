@@ -4,6 +4,8 @@
 {% endblock %}
 
 {% block content %}
+{% for group in user.groups.all %}
+    {% if group.name == 'Employees' %}
 <h1>Edit this book</h1>
 <form method="post" class="form-group">
     {% csrf_token %}
@@ -11,4 +13,7 @@
     
     <button type="submit">Save changes</button>
 </form>
+    {% endif %}
+{% endfor %}
+ 
 {% endblock %}

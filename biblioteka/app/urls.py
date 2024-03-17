@@ -4,11 +4,7 @@ from django.contrib.auth.views import LoginView
 
 
 urlpatterns = [
-    path("<int:id>",views.index, name="index"),
     path("home/", views.home, name="home"),
-    path("create/", views.create, name="create"),
-    path("home/", views.home, name="home"),
-    path("view/", views.view, name="view"),
     path('books/', views.book_list, name='book_list'),
     path('books/add/', views.add_book, name='add_book'),
     path('books/<int:book_id>/', views.edit_book, name='edit_book'),

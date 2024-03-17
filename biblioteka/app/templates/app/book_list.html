@@ -16,6 +16,7 @@
                 {% else %}
                     <span style="color:red;">Unavailable</span>
                 {% endif %}
+                {{ book.quantity }}
                 {% for group in user.groups.all %}
                     {% if group.name == 'Employees' %}
                     <form action="{% url 'delete_book' book.id %}" method="post" style="display: inline;" class="form-group">
@@ -35,5 +36,9 @@
     
     </div>
 </div>
+{% for group in user.groups.all %}
+    {% if group.name == 'Employees' %}
 <a href="{% url 'add_book' %}" class="btn btn-success">Add a new book</a>
+    {% endif %}
+{% endfor %}
 {% endblock %}
