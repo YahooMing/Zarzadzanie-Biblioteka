@@ -9,28 +9,32 @@
     <div class="input-group-prepend">
     <ul>
         {% for book in books %}
-            <li>
-                <strong>{{ book.title }}</strong> - {{ book.author }} - {{ book.genre }} ({{ book.year }})
+            <li style="margin:3px">
+                <strong>{{ book.title }}</strong> - {{ book.author }} - {{ book.genre }} ({{ book.year }}) - PUBLISHED BY {{ book.publisher }} -
                 {% if book.available %}
-                    <span style="color:green;">Available</span>
+                    <span style="color:green;">Available</span> 
                 {% else %}
-                    <span style="color:red;">Unavailable</span>
+                    <span style="color:red;">Unavailable</span> 
                 {% endif %}
-                {{ book.quantity }}
                 {% for group in user.groups.all %}
                     {% if group.name == 'Employees' %}
                     <form action="{% url 'delete_book' book.id %}" method="post" style="display: inline;" class="form-group">
                         {% csrf_token %}
                         <button type="submit" class="btn btn-success">Delete</button>
                     </form>
+                    <!-- 
                     <form action="{% url 'toggle_availability' book.id %}" method="post" style="display: inline;" class="form-group">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-success">Change availability </button>
-                </form>
+                </form>-->
                 <a href="{% url 'edit_book' book.id %}" class="btn btn-success">Edit</a>
                 {% endif %}
                 {% endfor %}
+                <form action="{% url 'borrow_book' book.id %}" method="post" style="display: inline;" class="form-group">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary">Borrow</button>
             </li>
+            
         {% endfor %}
     </ul>
     

@@ -1,0 +1,21 @@
+{% extends 'app/base.html' %}
+{% block title %}
+    Borrowed Books
+{% endblock %}
+
+{% block content %}
+<h1>Your Borrowed Books</h1>
+<ul>
+    {% for book in borrowed_books %}
+    <li>
+        <strong>{{ book.title }}</strong> - {{ book.author }} - {{ book.genre }} ({{ book.year }}) - PUBLISHED BY {{ book.publisher }} -
+        <form action="{% url 'return_book' book.id %}" method="post" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary">Return</button>
+        </form>
+    </li>
+    {% empty %}
+    <li>You haven't borrowed any books yet.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

@@ -2,6 +2,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render,redirect,get_object_or_404
 from .models import Book
 from .forms import BookForm
+from django.contrib.auth.decorators import login_required
 
 def book_list(request):
     books = Book.objects.all()
@@ -39,6 +40,29 @@ def edit_book(request, book_id):
         form = BookForm(instance=book)
     return render(request, 'app/edit_book.html', {'form': form})
 
+#@login_required
+def borrow_book(request, book_id):
+    book = Book.objects.get(pk=book_id)
+    if request.method == 'POST':
+        if book.available:
+            book.borrowed_by = request.user
+            book.save()
+            #return redirect('book_detail', book_id=book.id)  # Przekierowanie na stronę szczegółów książki
+    return render(request, 'app/borrow_book.html', {'book': book})
+
+#@login_required
+def borrowed_books(request):
+    user_borrowed_books = Book.objects.filter(borrowed_by=request.user)
+    return render(request, 'app/mypage.html', {'borrowed_books': user_borrowed_books})
+
+def return_book(request, book_id):
+    book = Book.objects.get(pk=book_id)
+    if request.method == 'POST':
+        if book.borrowed_by == request.user:
+            book.borrowed_by = None
+            book.save()
+            #return redirect('book_detail', book_id=book.id)
+    return render(request, 'app/return_book.html', {'book': book})
 
 def home(request):
     return render(request, "app/home.html", {})

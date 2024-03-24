@@ -1,0 +1,11 @@
+{% extends 'app/base.html' %}
+{% block title %}
+    Borrow a book
+{% endblock %}
+{% block content %}
+<h2>Borrow Book: {{ book.title }}</h2>
+<form method="post">
+  {% csrf_token %}
+  <button type="submit">Borrow</button>
+</form>
+{% endblock %}

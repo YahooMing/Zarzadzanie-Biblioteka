@@ -14,6 +14,7 @@ class Book(models.Model):
     borrowed_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="book", null=True, blank=True)
     available = models.BooleanField(default=True)
     quantity = models.PositiveIntegerField(default=1)
+    publisher = models.CharField(max_length=200,null=True, blank=True)
 
     def __str__(self):
         return self.title
@@ -24,7 +25,9 @@ class Book(models.Model):
     def save(self, *args, **kwargs):
         if self.borrowed_by is not None:
             if(self.quantity > 0):
-                self.quantity -= 1
+                self.quantity = 0
+        else:
+            self.quantity = 1
         if self.quantity == 0:
             self.available = False
         else:
