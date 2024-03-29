@@ -14,4 +14,7 @@ urlpatterns = [
     path('books/<int:book_id>/', views.borrow_book, name='borrow_book'),
     path('mypage/', views.borrowed_books, name='borrowed_books'),
     path('mypage/<int:book_id>/', views.return_book, name='return_book'),
+    path('add-to-wishlist/<int:book_id>/', views.add_to_wishlist, name='add_to_wishlist'),
+    path('remove-from-wishlist/<int:wishlist_id>/', views.remove_from_wishlist, name='remove_from_wishlist'),
+    path('wishlist/', views.wishlist, name='wishlist'),
 ]

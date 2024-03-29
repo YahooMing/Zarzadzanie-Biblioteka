@@ -33,6 +33,14 @@
                 <form action="{% url 'borrow_book' book.id %}" method="post" style="display: inline;" class="form-group">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-primary">Borrow</button>
+                </form>
+                {% if book.available %}
+                {% else %}
+                <form action="{% url 'add_to_wishlist' book.id %}" method="post">
+                    {% csrf_token %}
+                <button type="submit">Add to wishlist</button>
+                </form>
+                {% endif %}
             </li>
             
         {% endfor %}

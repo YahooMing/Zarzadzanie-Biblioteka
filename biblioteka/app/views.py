@@ -1,7 +1,7 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render,redirect,get_object_or_404
-from .models import Book
-from .forms import BookForm
+from .models import Book, Wishlist
+from .forms import BookForm,AddToWishlistForm
 from django.contrib.auth.decorators import login_required
 
 def book_list(request):
@@ -65,3 +65,25 @@ def return_book(request, book_id):
 def home(request):
     return render(request, "app/home.html", {})
 
+def wishlist(request):
+    wishlist_items = Wishlist.objects.filter(user=request.user)
+    return render(request, 'app/wishlist.html', {'wishlist_items': wishlist_items})
+
+def add_to_wishlist(request, book_id):
+    book = Book.objects.get(id=book_id)
+    if request.method == 'POST':
+        form = AddToWishlistForm(request.POST)
+        if form.is_valid():
+            wishlist_item = form.save(commit=False)
+            wishlist_item.user = request.user
+            wishlist_item.book = book
+            wishlist_item.save()
+            return redirect('wishlist')
+    else:
+        form = AddToWishlistForm()
+    return render(request, 'add_to_wishlist.html', {'form': form, 'book': book})
+
+def remove_from_wishlist(request, wishlist_id):
+    wishlist_item = Wishlist.objects.get(id=wishlist_id)
+    wishlist_item.delete()
+    return redirect('wishlist')

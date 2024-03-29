@@ -40,3 +40,10 @@ class Book(models.Model):
   #      if instance.borrowed_by is not None:
    #         instance.available = False
     #        instance.save()
+
+class Wishlist(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.user.username}'s Wishlist: {self.book.title}"
