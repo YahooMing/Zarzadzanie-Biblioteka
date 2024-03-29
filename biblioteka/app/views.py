@@ -43,12 +43,11 @@ def edit_book(request, book_id):
 #@login_required
 def borrow_book(request, book_id):
     book = Book.objects.get(pk=book_id)
-    if request.method == 'POST':
-        if book.available:
-            book.borrowed_by = request.user
-            book.save()
+    if book.available:
+        book.borrowed_by = request.user
+        book.save()
             #return redirect('book_detail', book_id=book.id)  # Przekierowanie na stronę szczegółów książki
-    return render(request, 'app/borrow_book.html', {'book': book})
+    return redirect('book_list')
 
 #@login_required
 def borrowed_books(request):
@@ -57,12 +56,11 @@ def borrowed_books(request):
 
 def return_book(request, book_id):
     book = Book.objects.get(pk=book_id)
-    if request.method == 'POST':
-        if book.borrowed_by == request.user:
-            book.borrowed_by = None
-            book.save()
+    if book.borrowed_by == request.user:
+        book.borrowed_by = None
+        book.save()
             #return redirect('book_detail', book_id=book.id)
-    return render(request, 'app/return_book.html', {'book': book})
+    return redirect('borrowed_books')
 
 def home(request):
     return render(request, "app/home.html", {})
