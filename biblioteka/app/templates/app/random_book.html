@@ -1,0 +1,21 @@
+{% extends 'app/base.html' %}
+{% block title %}
+    Draw a random book
+{% endblock %}
+{% block content %}
+<h1>Random Book Generator</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form }}
+        <button type="submit">Generate Random Book</button>
+    </form>
+    {% if random_book %}
+    <h2>Random Book:</h2>
+    <p>Title: {{ random_book.title }}</p>
+    <p>Author: {{ random_book.author }}</p>
+    <p>Genre: {{ random_book.genre }}</p>
+    {% endif %}
+    {% if error_message %}
+    <p>{{ error_message }}</p>
+    {% endif %}
+{% endblock %}

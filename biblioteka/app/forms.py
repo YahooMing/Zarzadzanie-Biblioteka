@@ -11,3 +11,7 @@ class AddToWishlistForm(forms.ModelForm):
     class Meta:
         model = Wishlist
         fields = []
+
+class GenreForm(forms.Form):
+    genre_choices = Book.GENRE_CHOICES
+    genre = forms.ChoiceField(choices=genre_choices)

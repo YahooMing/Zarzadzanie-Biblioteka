@@ -1,8 +1,9 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render,redirect,get_object_or_404
 from .models import Book, Wishlist
-from .forms import BookForm,AddToWishlistForm
+from .forms import BookForm,AddToWishlistForm,GenreForm
 from django.contrib.auth.decorators import login_required
+import random
 
 def book_list(request):
     books = Book.objects.all()
@@ -87,3 +88,21 @@ def remove_from_wishlist(request, wishlist_id):
     wishlist_item = Wishlist.objects.get(id=wishlist_id)
     wishlist_item.delete()
     return redirect('wishlist')
+
+def random_book(request):
+    error_message = None
+    random_book = None
+
+    if request.method == 'POST':
+        form = GenreForm(request.POST)
+        if form.is_valid():
+            selected_genre = form.cleaned_data['genre']
+            books = Book.objects.filter(genre=selected_genre)
+            if books.exists():
+                random_book = random.choice(books)
+            else:
+                error_message = 'There are no books available for the selected genre.'
+    else:
+        form = GenreForm()
+
+    return render(request, 'app/random_book.html', {'form': form, 'random_book': random_book, 'error_message': error_message})

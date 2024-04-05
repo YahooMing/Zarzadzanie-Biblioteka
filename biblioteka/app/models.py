@@ -7,9 +7,15 @@ from django.dispatch import receiver
 # Create your models here.
     
 class Book(models.Model):
+    GENRE_CHOICES = [
+        ('fiction', 'Fiction'),
+        ('non-fiction', 'Non-Fiction'),
+        ('fantasy', 'Fantasy'),
+        # Dodaj więcej gatunków według potrzeb
+        ]
     title = models.CharField(max_length=200)
     author = models.CharField(max_length=200)
-    genre = models.CharField(max_length=200)
+    genre = models.CharField(max_length=20, choices=GENRE_CHOICES)
     year = models.IntegerField()
     borrowed_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="book", null=True, blank=True)
     available = models.BooleanField(default=True)
