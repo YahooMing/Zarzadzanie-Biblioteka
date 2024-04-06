@@ -4,9 +4,21 @@
 {% endblock %}
 
 {% block content %}
+    
 <h1>Books</h1>
-<div class="input-group mb-3">
-    <div class="input-group-prepend">
+
+<!-- Formularz wyszukiwania -->
+<form method="get" action="{% url 'book_list' %}">
+    <div class="input-group mb-3">
+        <input type="text" class="form-control" placeholder="Search books..." name="search_query">
+        <div class="input-group-append">
+            <button class="btn btn-outline-secondary" type="submit">Search</button>
+        </div>
+    </div>
+</form>
+
+
+<div class="input-group-prepend">
     <ul>
         {% for book in books %}
             <li style="margin:3px">
@@ -46,12 +58,48 @@
             </li>
         {% endfor %}
     </ul>
-    
-    </div>
 </div>
+
 {% for group in user.groups.all %}
     {% if group.name == 'Employees' %}
 <a href="{% url 'add_book' %}" class="btn btn-success">Add a new book</a>
     {% endif %}
 {% endfor %}
+
+
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Sprawdź, czy w localStorage jest zapisana fraza wyszukiwania
+        var searchQuery = localStorage.getItem("lastSearchQuery");
+        // Jeśli jest, wypełnij pole wyszukiwania tą frazą
+        if (searchQuery) {
+            document.querySelector('input[name="search_query"]').value = searchQuery;
+        }
+    
+        // Nasłuchuj zdarzenie zmiany w polu wyszukiwania
+        document.querySelector('input[name="search_query"]').addEventListener("input", function() {
+            // Pobierz wartość wpisaną w polu wyszukiwania
+            var searchInput = document.querySelector('input[name="search_query"]').value;
+            // Zapisz tę wartość w localStorage
+            localStorage.setItem("lastSearchQuery", searchInput);
+        });
+    
+        // Nasłuchuj zdarzenie submit formularza wyszukiwania
+        document.querySelector("form").addEventListener("submit", function(event) {
+            // Pobierz wartość wpisaną w polu wyszukiwania
+            var searchInput = document.querySelector('input[name="search_query"]').value;
+            // Jeśli fraza wyszukiwania jest pusta, usuń zapisaną wartość z localStorage
+            if (!searchInput.trim()) {
+                localStorage.removeItem("lastSearchQuery");
+            } else {
+                // W przeciwnym razie zapisz wartość w localStorage
+                localStorage.setItem("lastSearchQuery", searchInput);
+            }
+        });
+    });
+    </script>
+      
+    
 {% endblock %}

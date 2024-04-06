@@ -7,7 +7,11 @@ import random
 
 @login_required
 def book_list(request):
-    books = Book.objects.all()
+    query = request.GET.get('search_query')
+    if query:
+        books = Book.objects.filter(title__icontains=query) | Book.objects.filter(author__icontains=query) | Book.objects.filter(genre__icontains=query)
+    else:
+        books = Book.objects.all()
     return render(request, 'app/book_list.html', {'books': books})
 
 @login_required
