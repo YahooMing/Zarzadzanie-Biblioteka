@@ -11,7 +11,6 @@ class Book(models.Model):
         ('fiction', 'Fiction'),
         ('non-fiction', 'Non-Fiction'),
         ('fantasy', 'Fantasy'),
-        # Dodaj więcej gatunków według potrzeb
         ]
     title = models.CharField(max_length=200)
     author = models.CharField(max_length=200)

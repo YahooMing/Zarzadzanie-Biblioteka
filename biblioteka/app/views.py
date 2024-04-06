@@ -5,10 +5,12 @@ from .forms import BookForm,AddToWishlistForm,GenreForm
 from django.contrib.auth.decorators import login_required
 import random
 
+@login_required
 def book_list(request):
     books = Book.objects.all()
     return render(request, 'app/book_list.html', {'books': books})
 
+@login_required
 def add_book(request):
     if request.method == 'POST':
         form = BookForm(request.POST)
@@ -19,17 +21,20 @@ def add_book(request):
         form = BookForm()
     return render(request, 'app/add_book.html', {'form': form})
 
+@login_required
 def delete_book(request, book_id):
     book = Book.objects.get(pk=book_id)
     book.delete()
     return redirect('book_list')
 
+@login_required
 def toggle_availability(request, book_id):
     book = Book.objects.get(pk=book_id)
     book.available = not book.available
     book.save()
     return redirect('book_list')
 
+@login_required
 def edit_book(request, book_id):
     book = get_object_or_404(Book, pk=book_id)
     if request.method == 'POST':
@@ -41,7 +46,7 @@ def edit_book(request, book_id):
         form = BookForm(instance=book)
     return render(request, 'app/edit_book.html', {'form': form})
 
-#@login_required
+@login_required
 def borrow_book(request, book_id):
     book = Book.objects.get(pk=book_id)
     if book.available:
@@ -50,11 +55,12 @@ def borrow_book(request, book_id):
             #return redirect('book_detail', book_id=book.id)  # Przekierowanie na stronę szczegółów książki
     return redirect('book_list')
 
-#@login_required
+@login_required
 def borrowed_books(request):
     user_borrowed_books = Book.objects.filter(borrowed_by=request.user)
     return render(request, 'app/mypage.html', {'borrowed_books': user_borrowed_books})
 
+@login_required
 def return_book(request, book_id):
     book = Book.objects.get(pk=book_id)
     if book.borrowed_by == request.user:
@@ -66,10 +72,12 @@ def return_book(request, book_id):
 def home(request):
     return render(request, "app/home.html", {})
 
+@login_required
 def wishlist(request):
     wishlist_items = Wishlist.objects.filter(user=request.user)
     return render(request, 'app/wishlist.html', {'wishlist_items': wishlist_items})
 
+@login_required
 def add_to_wishlist(request, book_id):
     book = Book.objects.get(id=book_id)
     if request.method == 'POST':
@@ -84,11 +92,13 @@ def add_to_wishlist(request, book_id):
         form = AddToWishlistForm()
     return render(request, 'add_to_wishlist.html', {'form': form, 'book': book})
 
+@login_required
 def remove_from_wishlist(request, wishlist_id):
     wishlist_item = Wishlist.objects.get(id=wishlist_id)
     wishlist_item.delete()
     return redirect('wishlist')
 
+@login_required
 def random_book(request):
     error_message = None
     random_book = None

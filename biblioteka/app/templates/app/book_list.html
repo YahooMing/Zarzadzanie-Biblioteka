@@ -11,38 +11,39 @@
         {% for book in books %}
             <li style="margin:3px">
                 <strong>{{ book.title }}</strong> - {{ book.author }} - {{ book.genre }} ({{ book.year }}) - PUBLISHED BY {{ book.publisher }} -
+
                 {% if book.available %}
                     <span style="color:green;">Available</span> 
                 {% else %}
                     <span style="color:red;">Unavailable</span> 
                 {% endif %}
+
                 {% for group in user.groups.all %}
                     {% if group.name == 'Employees' %}
                     <form action="{% url 'delete_book' book.id %}" method="post" style="display: inline;" class="form-group">
                         {% csrf_token %}
                         <button type="submit" class="btn btn-success">Delete</button>
                     </form>
-                    <!-- 
-                    <form action="{% url 'toggle_availability' book.id %}" method="post" style="display: inline;" class="form-group">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-success">Change availability </button>
-                </form>-->
                 <a href="{% url 'edit_book' book.id %}" class="btn btn-success">Edit</a>
                 {% endif %}
                 {% endfor %}
+
+                {% if book.available %}
                 <form action="{% url 'borrow_book' book.id %}" method="post" style="display: inline;" class="form-group">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-primary">Borrow</button>
                 </form>
-                {% if book.available %}
-                {% else %}
-                <form action="{% url 'add_to_wishlist' book.id %}" method="post">
-                    {% csrf_token %}
-                <button type="submit">Add to wishlist</button>
-                </form>
+                {% endif %}
+
+                {% if not book.available %}
+                    {% if not book.borrowed_by == user %}
+                    <form action="{% url 'add_to_wishlist' book.id %}" method="post">
+                        {% csrf_token %}
+                    <button type="submit" class="btn btn-primary">Add to wishlist</button>
+                    </form>
+                    {% endif %}
                 {% endif %}
             </li>
-            
         {% endfor %}
     </ul>
     
