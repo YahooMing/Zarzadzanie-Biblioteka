@@ -52,3 +52,13 @@ class Wishlist(models.Model):
 
     def __str__(self):
         return f"{self.user.username}'s Wishlist: {self.book.title}"
+    
+class BooksToTake(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    location = models.CharField(max_length=200)
+    date = models.DateField()
+    is_taken = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.user.username}'s Books to take: {self.book.title}"

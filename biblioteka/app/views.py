@@ -1,9 +1,11 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render,redirect,get_object_or_404
-from .models import Book, Wishlist
+from .models import Book, Wishlist, BooksToTake
 from .forms import BookForm,AddToWishlistForm,GenreForm
 from django.contrib.auth.decorators import login_required
 import random
+from datetime import datetime
+from django.contrib import messages
 
 @login_required
 def book_list(request):
@@ -56,7 +58,17 @@ def borrow_book(request, book_id):
     if book.available:
         book.borrowed_by = request.user
         book.save()
-            #return redirect('book_detail', book_id=book.id)  # Przekierowanie na stronę szczegółów książki
+    if request.method == 'POST':
+        location = request.POST.get('location')
+        date_str = request.POST.get('date')
+        date = datetime.strptime(date_str, '%Y-%m-%d').date()  # Konwersja daty z formatu tekstowego
+        if book.available:
+            book.available = False
+            book.save()
+            BooksToTake.objects.create(user=request.user, book=book, location=location, date=date)
+            messages.success(request, f'Book "{book.title}" borrowed successfully!')
+        else:
+            messages.error(request, f'Book "{book.title}" is not available for borrowing!')
     return redirect('book_list')
 
 @login_required

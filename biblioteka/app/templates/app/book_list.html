@@ -41,9 +41,16 @@
                 {% endfor %}
 
                 {% if book.available %}
-                <form action="{% url 'borrow_book' book.id %}" method="post" style="display: inline;" class="form-group">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-primary">Borrow</button>
+                <form id="borrowForm{{ book.id }}" action="{% url 'borrow_book' book.id %}" method="post" style="display: inline;" class="form-group">
+                    {% csrf_token %}
+                    <button type="button" class="btn btn-primary borrowButton" data-book-id="{{ book.id }}">Borrow</button>
+                    <div id="borrowFields{{ book.id }}" style="display: none;">
+                        <label for="location">Location:</label>
+                        <input type="text" id="location{{ book.id }}" name="location" required>
+                        <label for="date">Date:</label>
+                        <input type="date" id="date{{ book.id }}" name="date" required>
+                        <button type="submit" class="btn btn-primary">Confirm Borrow</button>
+                    </div>
                 </form>
                 {% endif %}
 
@@ -66,40 +73,17 @@
     {% endif %}
 {% endfor %}
 
-
-
-
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        // Sprawdź, czy w localStorage jest zapisana fraza wyszukiwania
-        var searchQuery = localStorage.getItem("lastSearchQuery");
-        // Jeśli jest, wypełnij pole wyszukiwania tą frazą
-        if (searchQuery) {
-            document.querySelector('input[name="search_query"]').value = searchQuery;
-        }
-    
-        // Nasłuchuj zdarzenie zmiany w polu wyszukiwania
-        document.querySelector('input[name="search_query"]').addEventListener("input", function() {
-            // Pobierz wartość wpisaną w polu wyszukiwania
-            var searchInput = document.querySelector('input[name="search_query"]').value;
-            // Zapisz tę wartość w localStorage
-            localStorage.setItem("lastSearchQuery", searchInput);
-        });
-    
-        // Nasłuchuj zdarzenie submit formularza wyszukiwania
-        document.querySelector("form").addEventListener("submit", function(event) {
-            // Pobierz wartość wpisaną w polu wyszukiwania
-            var searchInput = document.querySelector('input[name="search_query"]').value;
-            // Jeśli fraza wyszukiwania jest pusta, usuń zapisaną wartość z localStorage
-            if (!searchInput.trim()) {
-                localStorage.removeItem("lastSearchQuery");
-            } else {
-                // W przeciwnym razie zapisz wartość w localStorage
-                localStorage.setItem("lastSearchQuery", searchInput);
-            }
+        var borrowButtons = document.querySelectorAll(".borrowButton");
+        borrowButtons.forEach(function(button) {
+            button.addEventListener("click", function() {
+                var bookId = this.getAttribute("data-book-id");
+                document.getElementById("borrowFields" + bookId).style.display = "block";
+            });
         });
     });
-    </script>
+</script>
       
     
 {% endblock %}
