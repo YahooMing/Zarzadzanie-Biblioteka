@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 import random
 from datetime import datetime
 from django.contrib import messages
+from django.db import transaction
 
 @login_required
 def book_list(request):
@@ -54,27 +55,34 @@ def edit_book(request, book_id):
 
 @login_required
 def borrow_book(request, book_id):
-    book = Book.objects.get(pk=book_id)
-    if book.available:
-        book.borrowed_by = request.user
-        book.save()
     if request.method == 'POST':
-        location = request.POST.get('location')
-        date_str = request.POST.get('date')
-        date = datetime.strptime(date_str, '%Y-%m-%d').date()  # Konwersja daty z formatu tekstowego
+        book = Book.objects.get(pk=book_id)
         if book.available:
-            book.available = False
-            book.save()
-            BooksToTake.objects.create(user=request.user, book=book, location=location, date=date)
-            messages.success(request, f'Book "{book.title}" borrowed successfully!')
+            location = request.POST.get('location')
+            date_str = request.POST.get('date')
+            date = datetime.strptime(date_str, '%Y-%m-%d').date()  # Konwersja daty z formatu tekstowego
+            
+            # Usuń wszystkie istniejące rekordy związane z tą książką w modelu BooksToTake
+            BooksToTake.objects.filter(book=book).delete()
+
+            # Stwórz nowy rekord w modelu BooksToTake
+            with transaction.atomic():
+                book.borrowed_by = request.user
+                book.save()
+                BooksToTake.objects.create(user=request.user, book=book, location=location, date=date, is_taken=True)
+                messages.success(request, f'Book "{book.title}" borrowed successfully!')
         else:
             messages.error(request, f'Book "{book.title}" is not available for borrowing!')
-    return redirect('book_list')
+        return redirect('book_list')
+
+
+
 
 @login_required
 def borrowed_books(request):
     user_borrowed_books = Book.objects.filter(borrowed_by=request.user)
-    return render(request, 'app/mypage.html', {'borrowed_books': user_borrowed_books})
+    books_to_take = BooksToTake.objects.filter(user=request.user, is_taken=True)
+    return render(request, 'app/mypage.html', {'borrowed_books': user_borrowed_books, 'books_to_take': books_to_take})
 
 @login_required
 def return_book(request, book_id):
