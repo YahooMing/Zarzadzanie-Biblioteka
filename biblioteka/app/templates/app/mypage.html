@@ -14,16 +14,19 @@
             <p>Location: {{ book_to_take.location }}</p>
             <p>Date: {{ book_to_take.date }}</p>
             {% if book_to_take.is_taken %}
-                <p>Status: Taken</p>
-            {% else %}
-                <p>Status: Not Taken</p>
-            {% endif %}
-        {% endif %}
-    {% endfor %}          
-        <form action="{% url 'return_book' book.id %}" method="post" style="display: inline;">
+            <p>Status: Taken</p>
+            <form action="{% url 'return_book' book.id %}" method="post" style="display: inline;">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-primary">Return</button>
             </form>
+
+            {% else %}
+                <p>Status: Not Taken</p>
+            {% endif %}
+
+        {% endif %}
+    {% endfor %}          
+
     </li>
     {% empty %}
     <li>You haven't borrowed any books yet.</li>

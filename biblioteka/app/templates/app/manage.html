@@ -1,0 +1,25 @@
+{% extends 'app/base.html' %}
+{% block title %}
+    Manage books
+{% endblock %}
+
+{% block content %}
+    {% for book in all_borrowed_books %}
+        {% if not book.is_taken %}
+            <p>{{book.book}} ordered by {{book.user}}</p>
+
+                <button type="submit" class="btn btn-primary">Confirm this book as taken</button>
+
+        {% elif book.is_taken %}
+            <p>{{book.book}} was borrowed by {{book.user}}</p>
+
+                <button type="submit" class="btn btn-primary">Confirm this book as returned</button>
+
+        {% endif %}
+    {% endfor %}
+
+
+
+
+
+{% endblock %}

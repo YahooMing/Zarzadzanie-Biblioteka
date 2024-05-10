@@ -69,7 +69,7 @@ def borrow_book(request, book_id):
             with transaction.atomic():
                 book.borrowed_by = request.user
                 book.save()
-                BooksToTake.objects.create(user=request.user, book=book, location=location, date=date, is_taken=True)
+                BooksToTake.objects.create(user=request.user, book=book, location=location, date=date)
                 messages.success(request, f'Book "{book.title}" borrowed successfully!')
         else:
             messages.error(request, f'Book "{book.title}" is not available for borrowing!')
@@ -81,7 +81,7 @@ def borrow_book(request, book_id):
 @login_required
 def borrowed_books(request):
     user_borrowed_books = Book.objects.filter(borrowed_by=request.user)
-    books_to_take = BooksToTake.objects.filter(user=request.user, is_taken=True)
+    books_to_take = BooksToTake.objects.filter(user=request.user)
     return render(request, 'app/mypage.html', {'borrowed_books': user_borrowed_books, 'books_to_take': books_to_take})
 
 @login_required
@@ -90,6 +90,7 @@ def return_book(request, book_id):
     if book.borrowed_by == request.user:
         book.borrowed_by = None
         book.save()
+        BooksToTake.objects.filter(book=book).delete()
             #return redirect('book_detail', book_id=book.id)
     return redirect('borrowed_books')
 
@@ -140,3 +141,8 @@ def random_book(request):
         form = GenreForm()
 
     return render(request, 'app/random_book.html', {'form': form, 'random_book': random_book, 'error_message': error_message})
+
+@login_required
+def manage(request):
+    all_borrowed_books = BooksToTake.objects.all()
+    return render(request, 'app/manage.html', {'all_borrowed_books': all_borrowed_books})
