@@ -19,4 +19,6 @@ urlpatterns = [
     path('wishlist/', views.wishlist, name='wishlist'),
     path('random_book/', views.random_book, name='random_book'),
     path('manage/', views.manage, name='manage'),
+    path('confirm_taken/', views.confirm_taken, name='confirm_taken'),
+    path('confirm_returned/', views.confirm_returned, name='confirm_returned'),
 ]

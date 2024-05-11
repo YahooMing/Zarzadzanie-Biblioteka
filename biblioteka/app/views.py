@@ -76,8 +76,6 @@ def borrow_book(request, book_id):
         return redirect('book_list')
 
 
-
-
 @login_required
 def borrowed_books(request):
     user_borrowed_books = Book.objects.filter(borrowed_by=request.user)
@@ -86,12 +84,9 @@ def borrowed_books(request):
 
 @login_required
 def return_book(request, book_id):
-    book = Book.objects.get(pk=book_id)
-    if book.borrowed_by == request.user:
-        book.borrowed_by = None
-        book.save()
-        BooksToTake.objects.filter(book=book).delete()
-            #return redirect('book_detail', book_id=book.id)
+    book=BooksToTake.objects.get(book=book_id)
+    book.requested_to_return = True
+    book.save()
     return redirect('borrowed_books')
 
 def home(request):
@@ -146,3 +141,25 @@ def random_book(request):
 def manage(request):
     all_borrowed_books = BooksToTake.objects.all()
     return render(request, 'app/manage.html', {'all_borrowed_books': all_borrowed_books})
+
+@login_required
+def confirm_taken(request):
+    if request.method == 'POST':
+        book_id = request.POST.get('book_id')
+        book = BooksToTake.objects.get(pk=book_id)
+        book.is_taken = True
+        book.save()
+        return redirect('manage')
+
+def confirm_returned(request):
+    if request.method == 'POST':
+        book_id = request.POST.get('book_id')
+        book = BooksToTake.objects.get(pk=book_id)
+        book.is_taken = False
+        book.is_returned = True
+        book.save()
+        book_details = Book.objects.get(pk=book.book.id)
+        book_details.borrowed_by = None
+        book_details.save()
+        book.delete()
+        return redirect('manage')

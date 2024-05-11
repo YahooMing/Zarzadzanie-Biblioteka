@@ -7,19 +7,24 @@
     {% for book in all_borrowed_books %}
         {% if not book.is_taken %}
             <p>{{book.book}} ordered by {{book.user}}</p>
-
+            <form action="{% url 'confirm_taken' %}" method="post" style="display: inline;">
+                {% csrf_token %}
+                <input type="hidden" name="book_id" value="{{ book.id }}">
                 <button type="submit" class="btn btn-primary">Confirm this book as taken</button>
-
+            </form>
         {% elif book.is_taken %}
-            <p>{{book.book}} was borrowed by {{book.user}}</p>
-
-                <button type="submit" class="btn btn-primary">Confirm this book as returned</button>
-
+            
+            {% if book.requested_to_return %}
+            <p>{{book.book}} is marked as returned by {{book.user}}</p>
+                <form action="{% url 'confirm_returned' %}" method="post" style="display: inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="book_id" value="{{ book.id }}">
+                    <button type="submit" class="btn btn-primary">Confirm this book as returned</button>
+                </form>
+            {% else %}
+                <p>{{book.book}} is taken by {{book.user}}</p>
+                
+            {% endif %}
         {% endif %}
     {% endfor %}
-
-
-
-
-
 {% endblock %}
