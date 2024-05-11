@@ -44,6 +44,11 @@
         <a href="/mypage/">Books I've borrowed</a>
         <a href="/wishlist">My Wishlist</a>
         <a href="/random_book">Draw a random book</a>
+        {% for group in user.groups.all %}
+            {% if group.name == 'Employees' %}
+                <a href="/manage">Book orders</a>
+            {% endif %}
+        {% endfor %}
         <form method="post" action="{% url 'logout' %}">
             {% csrf_token %}
             <button type="submit" class="btn btn-success" style="position: fixed; text-align:center; bottom:0;margin:10px;">Logoff</button>

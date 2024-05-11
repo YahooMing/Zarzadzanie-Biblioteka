@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 import random
 from datetime import datetime
 from django.contrib import messages
+from django.db import transaction
 
 @login_required
 def book_list(request):
@@ -54,35 +55,38 @@ def edit_book(request, book_id):
 
 @login_required
 def borrow_book(request, book_id):
-    book = Book.objects.get(pk=book_id)
-    if book.available:
-        book.borrowed_by = request.user
-        book.save()
     if request.method == 'POST':
-        location = request.POST.get('location')
-        date_str = request.POST.get('date')
-        date = datetime.strptime(date_str, '%Y-%m-%d').date()  # Konwersja daty z formatu tekstowego
+        book = Book.objects.get(pk=book_id)
         if book.available:
-            book.available = False
-            book.save()
-            BooksToTake.objects.create(user=request.user, book=book, location=location, date=date)
-            messages.success(request, f'Book "{book.title}" borrowed successfully!')
+            location = request.POST.get('location')
+            date_str = request.POST.get('date')
+            date = datetime.strptime(date_str, '%Y-%m-%d').date()  # Konwersja daty z formatu tekstowego
+            
+            # Usuń wszystkie istniejące rekordy związane z tą książką w modelu BooksToTake
+            BooksToTake.objects.filter(book=book).delete()
+
+            # Stwórz nowy rekord w modelu BooksToTake
+            with transaction.atomic():
+                book.borrowed_by = request.user
+                book.save()
+                BooksToTake.objects.create(user=request.user, book=book, location=location, date=date)
+                messages.success(request, f'Book "{book.title}" borrowed successfully!')
         else:
             messages.error(request, f'Book "{book.title}" is not available for borrowing!')
-    return redirect('book_list')
+        return redirect('book_list')
+
 
 @login_required
 def borrowed_books(request):
     user_borrowed_books = Book.objects.filter(borrowed_by=request.user)
-    return render(request, 'app/mypage.html', {'borrowed_books': user_borrowed_books})
+    books_to_take = BooksToTake.objects.filter(user=request.user)
+    return render(request, 'app/mypage.html', {'borrowed_books': user_borrowed_books, 'books_to_take': books_to_take})
 
 @login_required
 def return_book(request, book_id):
-    book = Book.objects.get(pk=book_id)
-    if book.borrowed_by == request.user:
-        book.borrowed_by = None
-        book.save()
-            #return redirect('book_detail', book_id=book.id)
+    book=BooksToTake.objects.get(book=book_id)
+    book.requested_to_return = True
+    book.save()
     return redirect('borrowed_books')
 
 def home(request):
@@ -132,3 +136,30 @@ def random_book(request):
         form = GenreForm()
 
     return render(request, 'app/random_book.html', {'form': form, 'random_book': random_book, 'error_message': error_message})
+
+@login_required
+def manage(request):
+    all_borrowed_books = BooksToTake.objects.all()
+    return render(request, 'app/manage.html', {'all_borrowed_books': all_borrowed_books})
+
+@login_required
+def confirm_taken(request):
+    if request.method == 'POST':
+        book_id = request.POST.get('book_id')
+        book = BooksToTake.objects.get(pk=book_id)
+        book.is_taken = True
+        book.save()
+        return redirect('manage')
+
+def confirm_returned(request):
+    if request.method == 'POST':
+        book_id = request.POST.get('book_id')
+        book = BooksToTake.objects.get(pk=book_id)
+        book.is_taken = False
+        book.is_returned = True
+        book.save()
+        book_details = Book.objects.get(pk=book.book.id)
+        book_details.borrowed_by = None
+        book_details.save()
+        book.delete()
+        return redirect('manage')
