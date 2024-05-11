@@ -21,4 +21,6 @@ urlpatterns = [
     path('manage/', views.manage, name='manage'),
     path('confirm_taken/', views.confirm_taken, name='confirm_taken'),
     path('confirm_returned/', views.confirm_returned, name='confirm_returned'),
+    path('add_opinion/<int:book_id>/', views.add_opinion, name='add_opinion'),
+    path('delete_opinion/<int:opinion_id>/', views.delete_opinion, name='delete_opinion'),
 ]

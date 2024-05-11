@@ -1,6 +1,6 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render,redirect,get_object_or_404
-from .models import Book, Wishlist, BooksToTake
+from .models import Book, Wishlist, BooksToTake, LocalOpinions
 from .forms import BookForm,AddToWishlistForm,GenreForm
 from django.contrib.auth.decorators import login_required
 import random
@@ -15,6 +15,9 @@ def book_list(request):
         books = Book.objects.filter(title__icontains=query) | Book.objects.filter(author__icontains=query) | Book.objects.filter(genre__icontains=query)
     else:
         books = Book.objects.all()
+
+
+    
     return render(request, 'app/book_list.html', {'books': books})
 
 @login_required
@@ -150,7 +153,8 @@ def confirm_taken(request):
         book.is_taken = True
         book.save()
         return redirect('manage')
-
+    
+@login_required
 def confirm_returned(request):
     if request.method == 'POST':
         book_id = request.POST.get('book_id')
@@ -163,3 +167,23 @@ def confirm_returned(request):
         book_details.save()
         book.delete()
         return redirect('manage')
+    
+@login_required
+def add_opinion(request, book_id):
+    if request.method == 'POST':
+        book = Book.objects.get(pk=book_id)
+        opinion_text = request.POST.get('opinion')
+        rating = request.POST.get('rating')
+        LocalOpinions.objects.create(book=book, user=request.user, opinion=opinion_text, rating=rating, read=True)
+    
+    return redirect('book_list')  
+
+def delete_opinion(request, opinion_id):
+    opinion = get_object_or_404(LocalOpinions, pk=opinion_id)
+    
+    # Sprawdź, czy żądający użytkownik jest właścicielem opinii
+    if opinion.user == request.user:
+        opinion.delete()
+    
+    return redirect('book_list')  # Przekieruj użytkownika na stronę z listą książek
+
