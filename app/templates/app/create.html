@@ -1,0 +1,17 @@
+{% extends 'app/base.html' %}
+{% block title %}
+    Stwórz liste
+{% endblock %}
+
+{% block content %}
+    Formularz tworzący
+<form method="post" action="/create/" class="form-group">
+    {% csrf_token %}
+    <div class="input-group mb-3">
+        <div class="input-group-prepend">
+            <button type="submit" name="save" class="btn btn-success">Stwórz</button>
+        {{form.name}}
+        </div>
+    </div>
+</form>
+{% endblock %}

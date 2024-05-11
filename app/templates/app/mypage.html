@@ -1,0 +1,41 @@
+{% extends 'app/base.html' %}
+{% block title %}
+    Borrowed Books
+{% endblock %}
+
+{% block content %}
+<h1>Your Borrowed Books</h1>
+<ul>
+    {% for book in borrowed_books %}
+    <li>
+        <strong>{{ book.title }}</strong> - {{ book.author }} - {{ book.genre }} ({{ book.year }}) - PUBLISHED BY {{ book.publisher }} 
+        {% for book_to_take in books_to_take %}
+        {% if book_to_take.book == book %}
+            <p>Location: {{ book_to_take.location }}</p>
+            <p>Date: {{ book_to_take.date }}</p>
+
+            {% if book_to_take.is_taken %}
+                {% if book_to_take.requested_to_return %}
+                    <p>Status: Requested to return</p>
+                {% else %}
+                    <p>Status: Taken</p>            
+                    <form action="{% url 'return_book' book.id %}" method="post" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary">Return</button>
+                    </form>
+
+                {% endif %}
+
+            {% else %}
+                <p>Status: Not Taken</p>
+            {% endif %}
+
+        {% endif %}
+    {% endfor %}          
+
+    </li>
+    {% empty %}
+    <li>You haven't borrowed any books yet.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

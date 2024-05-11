@@ -1,0 +1,11 @@
+{% extends 'app/base.html' %}
+{% block title %}
+    Return a book
+{% endblock %}
+{% block content %}
+<h2>Return Book: {{ book.title }}</h2>
+<form method="post">
+  {% csrf_token %}
+  <button type="submit">Return</button>
+</form>
+{% endblock %}
