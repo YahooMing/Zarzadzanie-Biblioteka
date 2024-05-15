@@ -46,13 +46,16 @@
                             </li>
                         {% endfor %}
                     </ul>
-                    <!-- Formularz do dodawania opinii -->
-                        <form method="post" action="{% url 'add_opinion' book.id %}">
-                            {% csrf_token %}
-                            <textarea name="opinion" placeholder="Your opinion" required></textarea>
-                            <input type="number" name="rating" placeholder="Rating (1-10)" min="1" max="10" required>
-                            <button type="submit" class="btn btn-primary">Add Opinion</button>
-                        </form>
+                    {% if not book.user_has_opinion%}
+                    <form method="post" action="{% url 'add_opinion' book.id %}">
+                        {% csrf_token %}
+                        <textarea name="opinion" placeholder="Your opinion" required></textarea>
+                        <input type="number" name="rating" placeholder="Rating (1-10)" min="1" max="10" required>
+                        <button type="submit" class="btn btn-primary">Add Opinion</button>
+                    </form>
+                    {% else %}
+                    <p>You have already submitted an opinion for this book.</p>
+                    {% endif %}
                 
                 </div>
 

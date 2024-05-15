@@ -11,14 +11,18 @@ from django.db import transaction
 @login_required
 def book_list(request):
     query = request.GET.get('search_query')
+    
     if query:
         books = Book.objects.filter(title__icontains=query) | Book.objects.filter(author__icontains=query) | Book.objects.filter(genre__icontains=query)
     else:
         books = Book.objects.all()
 
+    for book in books:
+        book.user_has_opinion = book.localopinions_set.filter(user=request.user).exists()
 
-    
-    return render(request, 'app/book_list.html', {'books': books})
+
+    user = request.user
+    return render(request, 'app/book_list.html', {'books': books, 'user': user})
 
 @login_required
 def add_book(request):
@@ -170,13 +174,15 @@ def confirm_returned(request):
     
 @login_required
 def add_opinion(request, book_id):
+    book = Book.objects.get(pk=book_id)
+    user_opinion = LocalOpinions.objects.filter(book=book, user=request.user).exists()
     if request.method == 'POST':
-        book = Book.objects.get(pk=book_id)
-        opinion_text = request.POST.get('opinion')
-        rating = request.POST.get('rating')
-        LocalOpinions.objects.create(book=book, user=request.user, opinion=opinion_text, rating=rating, read=True)
+        if not user_opinion:  # Sprawdzanie, czy użytkownik już wystawił opinię
+            opinion_text = request.POST.get('opinion')
+            rating = request.POST.get('rating')
+            LocalOpinions.objects.create(book=book, user=request.user, opinion=opinion_text, rating=rating, read=True)
+    return redirect('book_list')
     
-    return redirect('book_list')  
 
 def delete_opinion(request, opinion_id):
     opinion = get_object_or_404(LocalOpinions, pk=opinion_id)
