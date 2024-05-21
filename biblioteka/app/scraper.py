@@ -43,7 +43,7 @@ def fetch_external_reviews(book_title):
         if review_rating_element:
             review_rating = int(review_rating_element.text.strip())
         else:
-            review_rating = None  # Lub inna wartość domyślna w przypadku braku oceny
+            review_rating = None 
 
         reviews.append(f"{review_author}:{review_rating} :{review_text}")
 

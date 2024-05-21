@@ -17,6 +17,7 @@
     </div>
 </form>
 
+
 <div class="input-group-prepend">
     <ul>
         {% for book in books %}
@@ -27,6 +28,47 @@
                     <span style="color:green;">Available</span> 
                 {% else %}
                     <span style="color:red;">Unavailable</span> 
+                {% endif %}
+
+                {% for group in user.groups.all %}
+                    {% if group.name == 'Employees' %}
+                    <form action="{% url 'delete_book' book.id %}" method="post" style="display: inline;" class="form-group">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success">Delete</button>
+                    </form>
+                <a href="{% url 'edit_book' book.id %}" class="btn btn-success">Edit</a>
+                {% endif %}
+                {% endfor %}
+
+                {% if book.available %}
+                <form id="borrowForm{{ book.id }}" action="{% url 'borrow_book' book.id %}" method="post" style="display: inline;" class="form-group">
+                    {% csrf_token %}
+                    <button type="button" class="btn btn-primary borrowButton" data-book-id="{{ book.id }}">Order</button>
+                    <div id="borrowFields{{ book.id }}" style="display: none;">
+                        <label for="location{{ book.id }}">Location:</label>
+                        <select id="location{{ book.id }}" name="location" required>
+                            <option value="">Select location</option>
+                            <option value="Location 1">Location 1</option>
+                            <option value="Location 2">Location 2</option>
+                            <option value="Location 3">Location 3</option>
+                            <!-- Dodaj więcej opcji według potrzeb -->
+                        </select>
+                        
+                        <label for="date{{ book.id }}">Date:</label>
+                        <input type="date" id="date{{ book.id }}" name="date" required>
+                        <button type="submit" class="btn btn-primary">Confirm Order</button>
+                    </div>
+                </form>
+                
+                {% endif %}
+
+                {% if not book.available %}
+                    {% if not book.borrowed_by == user %}
+                    <form action="{% url 'add_to_wishlist' book.id %}" method="post">
+                        {% csrf_token %}
+                    <button type="submit" class="btn btn-primary">Add to wishlist</button>
+                    </form>
+                    {% endif %}
                 {% endif %}
 
                 <!-- Dodaj sekcję do wyświetlania opinii -->
@@ -69,11 +111,37 @@
     </ul>
 </div>
 
-{% if user.is_authenticated %}
-    <a href="{% url 'add_book' %}" class="btn btn-success">Add a new book</a>
-{% endif %}
+{% for group in user.groups.all %}
+    {% if group.name == 'Employees' %}
+<a href="{% url 'add_book' %}" class="btn btn-success">Add a new book</a>
+    {% endif %}
+{% endfor %}
 
 <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var borrowButtons = document.querySelectorAll(".borrowButton");
+        borrowButtons.forEach(function(button) {
+            button.addEventListener("click", function() {
+                var bookId = this.getAttribute("data-book-id");
+                document.getElementById("borrowFields" + bookId).style.display = "block";
+            });
+        });
+    });
+
+
+
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const borrowButtons = document.querySelectorAll('.borrowButton');
+        borrowButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const bookId = button.getAttribute('data-book-id');
+                const borrowFields = document.getElementById('borrowFields' + bookId);
+                borrowFields.style.display = 'block';
+            });
+        });
+    });
+
     document.addEventListener("DOMContentLoaded", function() {
         var showMoreButtons = document.querySelectorAll(".show-more-opinions");
         showMoreButtons.forEach(function(button) {
@@ -105,4 +173,6 @@
         });
     });
 </script>
+      
+    
 {% endblock %}
