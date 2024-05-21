@@ -7,6 +7,12 @@ import random
 from datetime import datetime
 from django.contrib import messages
 from django.db import transaction
+from django.http import JsonResponse
+from .scraper import fetch_external_reviews
+from bs4 import BeautifulSoup
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+import requests
 
 @login_required
 def book_list(request):
@@ -193,3 +199,40 @@ def delete_opinion(request, opinion_id):
     
     return redirect('book_list')  # Przekieruj użytkownika na stronę z listą książek
 
+@login_required
+def fetch_goodreads_reviews(book_title):
+    search_url = f'https://www.goodreads.com/search?q={book_title}'
+    search_response = requests.get(search_url)
+    
+    if search_response.status_code != 200:
+        return []
+    
+    search_soup = BeautifulSoup(search_response.content, 'html.parser')
+    book_link = search_soup.find('a', class_='bookTitle')
+    
+    if not book_link:
+        return []
+    
+    book_page_url = 'https://www.goodreads.com' + book_link['href']
+    book_response = requests.get(book_page_url)
+    
+    if book_response.status_code != 200:
+        return []
+    
+    book_soup = BeautifulSoup(book_response.content, 'html.parser')
+    reviews = []
+    review_elements = book_soup.find_all('div', class_='reviewText stacked')
+    
+    for element in review_elements:
+        review_text = element.find('span', style='display:none').text.strip()
+        reviews.append(review_text)
+    
+    return reviews
+
+@login_required
+def fetch_reviews(request, book_id):
+    book = get_object_or_404(Book, id=book_id)
+    external_reviews = fetch_external_reviews(book.title)
+    if not external_reviews:
+        external_reviews = ["No reviews found."]
+    return JsonResponse({'reviews': external_reviews})

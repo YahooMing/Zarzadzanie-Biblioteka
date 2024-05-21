@@ -23,4 +23,6 @@ urlpatterns = [
     path('confirm_returned/', views.confirm_returned, name='confirm_returned'),
     path('add_opinion/<int:book_id>/', views.add_opinion, name='add_opinion'),
     path('delete_opinion/<int:opinion_id>/', views.delete_opinion, name='delete_opinion'),
+    path('fetch-reviews/<int:book_id>/', views.fetch_reviews, name='fetch_reviews'),
+    
 ]
