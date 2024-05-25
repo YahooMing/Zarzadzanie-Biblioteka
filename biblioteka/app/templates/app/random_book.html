@@ -7,7 +7,7 @@
     <form method="post">
         {% csrf_token %}
         {{ form }}
-        <button type="submit">Generate Random Book</button>
+        <button class="btn btn-outline-secondary" type="submit">Generate Random Book</button>
     </form>
     {% if random_book %}
     <h2>Random Book:</h2>

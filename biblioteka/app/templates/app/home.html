@@ -6,6 +6,15 @@
 {% block content %}
 {% if user.is_authenticated %}
     <h1>Homepage</h1>
+    <br>
+    <h2>Welcome {{ user.username }}</h2>
+    <br>
+    <h3>This month's sponsor is Hexxer Toothpaste</h3>
+    <img src="../../../sponsor/ad.jpg">
+    <br>
+    Brush your teeth like a Wither using Hexxer Toothpaste! 
+
+    
 {% else %}
     <h1>In order to use this site you need to log in</h1>
     <br><br>
