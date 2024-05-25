@@ -199,35 +199,6 @@ def delete_opinion(request, opinion_id):
     
     return redirect('book_list')  # Przekieruj użytkownika na stronę z listą książek
 
-@login_required
-def fetch_goodreads_reviews(book_title):
-    search_url = f'https://www.goodreads.com/search?q={book_title}'
-    search_response = requests.get(search_url)
-    
-    if search_response.status_code != 200:
-        return []
-    
-    search_soup = BeautifulSoup(search_response.content, 'html.parser')
-    book_link = search_soup.find('a', class_='bookTitle')
-    
-    if not book_link:
-        return []
-    
-    book_page_url = 'https://www.goodreads.com' + book_link['href']
-    book_response = requests.get(book_page_url)
-    
-    if book_response.status_code != 200:
-        return []
-    
-    book_soup = BeautifulSoup(book_response.content, 'html.parser')
-    reviews = []
-    review_elements = book_soup.find_all('div', class_='reviewText stacked')
-    
-    for element in review_elements:
-        review_text = element.find('span', style='display:none').text.strip()
-        reviews.append(review_text)
-    
-    return reviews
 
 @login_required
 def fetch_reviews(request, book_id):
@@ -236,3 +207,13 @@ def fetch_reviews(request, book_id):
     if not external_reviews:
         external_reviews = ["No reviews found."]
     return JsonResponse({'reviews': external_reviews})
+
+
+@login_required
+def home(request):
+    wishlist_items = Wishlist.objects.filter(user=request.user)
+    for item in wishlist_items:
+        if item.book.available:
+            messages.info(request, f'Book "{item.book.title}" from your wishlist is now available!')
+
+    return render(request, "app/home.html", {})

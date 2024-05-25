@@ -36,18 +36,30 @@ def fetch_external_reviews(book_title):
         print("No review elements found")
         return []
 
+    review_count = 0  # Licznik przetworzonych recenzji
+
     for element in review_elements:
+        if review_count >= 5:  # Sprawdź, czy przetworzono już 5 recenzji
+            break
+
         review_author = element.find('div', class_='reviewer-nick').text.strip()
         review_text = element.find('div', class_='comment-cloud__body relative').text.strip()
         review_rating_element = element.find('span', class_='big-number')
         if review_rating_element:
             review_rating = int(review_rating_element.text.strip())
         else:
-            review_rating = None 
+            review_rating = "Brak oceny"  # Jeśli ocena nie jest dostępna
 
-        reviews.append(f"{review_author}:{review_rating} :{review_text}")
+        formatted_review = (
+            f"{review_author} -- \n"
+            f"{review_rating}/10 -- \n"
+            f"{review_text}\n"
+        )
+
+        reviews.append(formatted_review)
+        review_count += 1  # Zwiększ licznik przetworzonych recenzji
 
     return reviews
 
 # Example call
-#print(fetch_external_reviews("Harry Potter"))
+#print("\n".join(fetch_external_reviews("Harry Potter")))

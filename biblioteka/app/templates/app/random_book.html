@@ -4,17 +4,18 @@
 {% endblock %}
 {% block content %}
 <h1>Random Book Generator</h1>
-    <form method="post">
-        {% csrf_token %}
-        {{ form }}
-        <button class="btn btn-outline-secondary" type="submit">Generate Random Book</button>
-    </form>
-    {% if random_book %}
-    <h2>Random Book:</h2>
-    <p>Title: {{ random_book.title }}</p>
-    <p>Author: {{ random_book.author }}</p>
-    {% endif %}
-    {% if error_message %}
-    <p>{{ error_message }}</p>
-    {% endif %}
+<form method="post">
+    {% csrf_token %}
+    {{ form }}
+    <button class="btn btn-outline-secondary" type="submit">Generate Random Book</button>
+</form>
+{% if random_book %}
+<h2>Random Book:</h2>
+<p>Title: {{ random_book.title }}</p>
+<p>Author: {{ random_book.author }}</p>
+<a href="{% url 'book_list' %}?search_query={{ random_book.title }}" class="btn btn-primary">Borrow this book</a>
+{% endif %}
+{% if error_message %}
+<p>{{ error_message }}</p>
+{% endif %}
 {% endblock %}

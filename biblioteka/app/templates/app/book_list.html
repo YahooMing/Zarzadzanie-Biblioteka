@@ -4,19 +4,17 @@
 {% endblock %}
 
 {% block content %}
-    
 <h1>Books</h1>
 
 <!-- Formularz wyszukiwania -->
 <form method="get" action="{% url 'book_list' %}">
     <div class="input-group mb-3">
-        <input type="text" class="form-control" placeholder="Search books..." name="search_query">
+        <input type="text" class="form-control" id="searchInput" placeholder="Search books..." name="search_query" value="{{ request.GET.search_query }}">
         <div class="input-group-append">
             <button class="btn btn-outline-secondary" type="submit">Search</button>
         </div>
     </div>
 </form>
-
 
 <div class="input-group-prepend">
     <ul>
@@ -128,9 +126,6 @@
         });
     });
 
-
-
-
     document.addEventListener("DOMContentLoaded", function() {
         const borrowButtons = document.querySelectorAll('.borrowButton');
         borrowButtons.forEach(button => {
@@ -172,7 +167,22 @@
             });
         });
     });
+
+    // JavaScript to auto-fill the search input if 'search_query' parameter is present in URL
+    document.addEventListener("DOMContentLoaded", function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const searchQuery = urlParams.get('search_query');
+        if (searchQuery) {
+            document.getElementById('searchInput').value = searchQuery;
+        }
+    });
+    //Wypełnianie pola gdy przychodzimy z wishlista
+    document.addEventListener("DOMContentLoaded", function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const searchQuery = urlParams.get('search_query');
+        if (searchQuery) {
+            document.getElementById('searchInput').value = searchQuery;
+        }
+    });
 </script>
-      
-    
 {% endblock %}
