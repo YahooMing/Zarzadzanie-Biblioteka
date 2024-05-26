@@ -1,20 +1,37 @@
 {% extends 'app/base.html' %}
+{% load static %}
+
 {% block title %}
     Draw a random book
 {% endblock %}
 {% block content %}
-<h1>Random Book Generator</h1>
-    <form method="post">
-        {% csrf_token %}
-        {{ form }}
-        <button type="submit">Generate Random Book</button>
-    </form>
-    {% if random_book %}
-    <h2>Random Book:</h2>
-    <p>Title: {{ random_book.title }}</p>
-    <p>Author: {{ random_book.author }}</p>
-    {% endif %}
-    {% if error_message %}
-    <p>{{ error_message }}</p>
-    {% endif %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h1 class="text-center mb-4">Random Book Generator</h1>
+            <form method="post" class="text-center">
+                {% csrf_token %}
+                <div class="form-group">
+                    {{ form }}
+                </div>
+                <button class="btn btn-outline-secondary mt-3" type="submit">Generate Random Book</button>
+            </form>
+            {% if random_book %}
+                <div class="mt-5 p-4 border rounded">
+                    <h2 class="text-center">Random Book:</h2>
+                    <p><strong>Title:</strong> {{ random_book.title }}</p>
+                    <p><strong>Author:</strong> {{ random_book.author }}</p>
+                    <div class="text-center">
+                        <a href="{% url 'book_list' %}?search_query={{ random_book.title }}" class="btn btn-primary">Borrow this book</a>
+                    </div>
+                </div>
+            {% endif %}
+            {% if error_message %}
+                <div class="alert alert-danger mt-3" role="alert">
+                    {{ error_message }}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
 {% endblock %}

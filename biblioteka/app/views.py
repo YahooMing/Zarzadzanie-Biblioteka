@@ -1,21 +1,34 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render,redirect,get_object_or_404
-from .models import Book, Wishlist, BooksToTake
+from .models import Book, Wishlist, BooksToTake, LocalOpinions
 from .forms import BookForm,AddToWishlistForm,GenreForm
 from django.contrib.auth.decorators import login_required
 import random
 from datetime import datetime
 from django.contrib import messages
 from django.db import transaction
+from django.http import JsonResponse
+from .scraper import fetch_external_reviews
+from bs4 import BeautifulSoup
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+import requests
 
 @login_required
 def book_list(request):
     query = request.GET.get('search_query')
+    
     if query:
         books = Book.objects.filter(title__icontains=query) | Book.objects.filter(author__icontains=query) | Book.objects.filter(genre__icontains=query)
     else:
         books = Book.objects.all()
-    return render(request, 'app/book_list.html', {'books': books})
+
+    for book in books:
+        book.user_has_opinion = book.localopinions_set.filter(user=request.user).exists()
+
+
+    user = request.user
+    return render(request, 'app/book_list.html', {'books': books, 'user': user})
 
 @login_required
 def add_book(request):
@@ -150,7 +163,8 @@ def confirm_taken(request):
         book.is_taken = True
         book.save()
         return redirect('manage')
-
+    
+@login_required
 def confirm_returned(request):
     if request.method == 'POST':
         book_id = request.POST.get('book_id')
@@ -163,3 +177,43 @@ def confirm_returned(request):
         book_details.save()
         book.delete()
         return redirect('manage')
+    
+@login_required
+def add_opinion(request, book_id):
+    book = Book.objects.get(pk=book_id)
+    user_opinion = LocalOpinions.objects.filter(book=book, user=request.user).exists()
+    if request.method == 'POST':
+        if not user_opinion:  # Sprawdzanie, czy użytkownik już wystawił opinię
+            opinion_text = request.POST.get('opinion')
+            rating = request.POST.get('rating')
+            LocalOpinions.objects.create(book=book, user=request.user, opinion=opinion_text, rating=rating, read=True)
+    return redirect('book_list')
+    
+
+def delete_opinion(request, opinion_id):
+    opinion = get_object_or_404(LocalOpinions, pk=opinion_id)
+    
+    # Sprawdź, czy żądający użytkownik jest właścicielem opinii
+    if opinion.user == request.user:
+        opinion.delete()
+    
+    return redirect('book_list')  # Przekieruj użytkownika na stronę z listą książek
+
+
+@login_required
+def fetch_reviews(request, book_id):
+    book = get_object_or_404(Book, id=book_id)
+    external_reviews = fetch_external_reviews(book.title)
+    if not external_reviews:
+        external_reviews = ["No reviews found."]
+    return JsonResponse({'reviews': external_reviews})
+
+
+@login_required
+def home(request):
+    wishlist_items = Wishlist.objects.filter(user=request.user)
+    for item in wishlist_items:
+        if item.book.available:
+            messages.info(request, f'Book "{item.book.title}" from your wishlist is now available!')
+
+    return render(request, "app/home.html", {})

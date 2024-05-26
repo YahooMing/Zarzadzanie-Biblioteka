@@ -4,38 +4,39 @@
 {% endblock %}
 
 {% block content %}
-<h1>Your Borrowed Books</h1>
-<ul>
-    {% for book in borrowed_books %}
-    <li>
-        <strong>{{ book.title }}</strong> - {{ book.author }} - {{ book.genre }} ({{ book.year }}) - PUBLISHED BY {{ book.publisher }} 
-        {% for book_to_take in books_to_take %}
-        {% if book_to_take.book == book %}
-            <p>Location: {{ book_to_take.location }}</p>
-            <p>Date: {{ book_to_take.date }}</p>
-
-            {% if book_to_take.is_taken %}
-                {% if book_to_take.requested_to_return %}
-                    <p>Status: Requested to return</p>
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Your Borrowed Books</h1>
+    <ul class="list-group">
+        {% for book in borrowed_books %}
+        <li class="list-group-item mb-3">
+            <h3 class="mb-1">{{ book.title }}</h3>
+            <p><strong>Author:</strong> {{ book.author }}</p>
+            <p><strong>Genre:</strong> {{ book.genre }}</p>
+            <p><strong>Year:</strong> {{ book.year }}</p>
+            <p><strong>Publisher:</strong> {{ book.publisher }}</p>
+            {% for book_to_take in books_to_take %}
+            {% if book_to_take.book == book %}
+                <p><strong>Location:</strong> {{ book_to_take.location }}</p>
+                <p><strong>Date:</strong> {{ book_to_take.date }}</p>
+                {% if book_to_take.is_taken %}
+                    {% if book_to_take.requested_to_return %}
+                        <p><strong>Status:</strong> Requested to return</p>
+                    {% else %}
+                        <p><strong>Status:</strong> Taken</p>
+                        <form action="{% url 'return_book' book.id %}" method="post" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary">Return</button>
+                        </form>
+                    {% endif %}
                 {% else %}
-                    <p>Status: Taken</p>            
-                    <form action="{% url 'return_book' book.id %}" method="post" style="display: inline;">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-primary">Return</button>
-                    </form>
-
+                    <p><strong>Status:</strong> Not Taken</p>
                 {% endif %}
-
-            {% else %}
-                <p>Status: Not Taken</p>
             {% endif %}
-
-        {% endif %}
-    {% endfor %}          
-
-    </li>
-    {% empty %}
-    <li>You haven't borrowed any books yet.</li>
-    {% endfor %}
-</ul>
+            {% endfor %}
+        </li>
+        {% empty %}
+        <li class="list-group-item">You haven't borrowed any books yet.</li>
+        {% endfor %}
+    </ul>
+</div>
 {% endblock %}

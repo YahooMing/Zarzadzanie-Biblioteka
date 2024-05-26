@@ -64,3 +64,16 @@ class BooksToTake(models.Model):
 
     def __str__(self):
         return f"{self.user.username}'s Books to take: {self.book.title}"
+    
+class LocalOpinions(models.Model):
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    opinion = models.TextField()
+    rating = models.IntegerField()
+    read = models.BooleanField(default=False)
+    
+    class Meta():
+        unique_together = ('book', 'user')
+
+    def __str__(self):
+        return f"{self.user.username}'s opinion on {self.book.title}"

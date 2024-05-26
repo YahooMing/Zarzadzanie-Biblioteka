@@ -2,15 +2,25 @@
 {% block title %}
     My Wishlist
 {% endblock %}
-{% block content %}
+{% block content %}   
+<h1>My Wishlist</h1>
+{% if wishlist_items|length == 0 %}
+    <h3>Your wishlist is empty</h3>
+{% endif %}
 {% for item in wishlist_items %}
+
     <div class="wishlist-item">
-        <h3>{{ item.book.title }}</h3>
-        <p>Author: {{ item.book.author }}</p>
+        <h3>{{ item.book.title }} - Author: {{ item.book.author }} - Publisher: {{item.book.publisher}}</h3>
         <form action="{% url 'remove_from_wishlist' item.id %}" method="post">
             {% csrf_token %}
-            <button type="submit">Remove from wishlist</button>
+            <button type="submit" class="btn btn-danger">Remove from wishlist</button>
         </form>
+        {% if item.book.available %}
+            <form method="get" action="{% url 'book_list' %}">
+                <input type="hidden" name="search_query" value="{{ item.book.title }}">
+                <button type="submit" class="btn btn-primary">Borrow this book</button>
+            </form>
+        {% endif %}
     </div>
 {% endfor %}
 {% endblock %}
