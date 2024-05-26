@@ -4,27 +4,34 @@
 {% endblock %}
 
 {% block content %}
-    {% for book in all_borrowed_books %}
-        {% if not book.is_taken %}
-            <p>{{book.book}} ordered by {{book.user}}</p>
-            <form action="{% url 'confirm_taken' %}" method="post" style="display: inline;">
-                {% csrf_token %}
-                <input type="hidden" name="book_id" value="{{ book.id }}">
-                <button type="submit" class="btn btn-primary">Confirm this book as taken</button>
-            </form>
-        {% elif book.is_taken %}
-            
-            {% if book.requested_to_return %}
-            <p>{{book.book}} is marked as returned by {{book.user}}</p>
-                <form action="{% url 'confirm_returned' %}" method="post" style="display: inline;">
-                    {% csrf_token %}
-                    <input type="hidden" name="book_id" value="{{ book.id }}">
-                    <button type="submit" class="btn btn-primary">Confirm this book as returned</button>
-                </form>
-            {% else %}
-                <p>{{book.book}} is taken by {{book.user}}</p>
-                
-            {% endif %}
-        {% endif %}
-    {% endfor %}
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Manage Borrowed Books</h1>
+    <div class="list-group">
+        {% for book in all_borrowed_books %}
+            <div class="list-group-item mb-3 p-3">
+                <p>
+                    <strong>{{ book.book }}</strong> ordered by <strong>{{ book.user }}</strong>
+                    {% if not book.is_taken %}
+                    <form action="{% url 'confirm_taken' %}" method="post" class="d-inline ml-2">
+                        {% csrf_token %}
+                        <input type="hidden" name="book_id" value="{{ book.id }}">
+                        <button type="submit" class="btn btn-primary btn-sm">Confirm as Taken</button>
+                    </form>
+                    {% elif book.is_taken %}
+                        {% if book.requested_to_return %}
+                            <span class="text-warning ml-2">is marked as returned by {{ book.user }}</span>
+                            <form action="{% url 'confirm_returned' %}" method="post" class="d-inline ml-2">
+                                {% csrf_token %}
+                                <input type="hidden" name="book_id" value="{{ book.id }}">
+                                <button type="submit" class="btn btn-primary btn-sm">Confirm as Returned</button>
+                            </form>
+                        {% else %}
+                            <span class="text-success ml-2">is taken by {{ book.user }}</span>
+                        {% endif %}
+                    {% endif %}
+                </p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
 {% endblock %}

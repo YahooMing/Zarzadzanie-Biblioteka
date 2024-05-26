@@ -2,8 +2,13 @@
 {% block title %}
     My Wishlist
 {% endblock %}
-{% block content %}
+{% block content %}   
+<h1>My Wishlist</h1>
+{% if wishlist_items|length == 0 %}
+    <h3>Your wishlist is empty</h3>
+{% endif %}
 {% for item in wishlist_items %}
+
     <div class="wishlist-item">
         <h3>{{ item.book.title }} - Author: {{ item.book.author }} - Publisher: {{item.book.publisher}}</h3>
         <form action="{% url 'remove_from_wishlist' item.id %}" method="post">
